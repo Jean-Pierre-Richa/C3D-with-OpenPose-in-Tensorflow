@@ -1,6 +1,18 @@
+# This implementation of C3D and Openpose for pose estimation  
+In this repository, we are implementing pose estimation, thanks to the developers of C3D in Tensorflow and pose estimation, using the previously mentioned models. There's only one video in the H3.6M file, for testing purposes.   
+
+# Requirements for this project:  
+1. install the dependencies: import the environment: conda env create -f environment.yml  
+2. To train the model on your own dataset: python train_c3d_ucf101.py   
+3. For prediction: python predict_c3d_ucf101.py  
+
+
+# The below guide is to train the model done by the original developer of this project
+# A big Thanks to HouXin - hx173149
+
 # C3D-tensorflow
 
-This is a repository trying to implement [C3D-caffe][5] on tensorflow,using models directly converted from original C3D-caffe.    
+This is a repository trying to implement [C3D-caffe][5] on tensorflow, using models directly converted from original C3D-caffe.    
 Be aware that there are about 5% video-level accuracy margin on UCF101 split1  between our implement in tensorflow and  the original C3D-caffe.  
 
 ## Requirements:
