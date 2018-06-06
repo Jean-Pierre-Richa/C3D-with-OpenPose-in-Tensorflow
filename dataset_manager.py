@@ -65,7 +65,8 @@ def read_clip_and_label(Batch_size, frames_per_step, im_size, sess):
 
             labels_list = []
             c = 0
-            # for vidName in Json_dict:
+
+            # Append the labels 1 time to have the classes labels
             for label in Json_dict[entry_name]:
                 print(label)
                 if (label['label'] not in labels_list):
@@ -74,15 +75,16 @@ def read_clip_and_label(Batch_size, frames_per_step, im_size, sess):
             print(c, 'labels_list')
             # id_to_label = dict(enumerate(labels))
             # print ('ID to labels: ', id_to_label )
-            label_to_id = dict(map(reversed, enumerate(labels_list)))
-            print('label to ID: ', label_to_id)
+        label_to_id = dict(map(reversed, enumerate(labels_list)))
+        print('label to ID: ', label_to_id)
 
-            segment = training_entry['milliseconds']
+        segment = training_entry['milliseconds']
 
-            clip = get_frames(path, frames_per_step, segment, im_size, sess)
-            batch[s, :, :, :, :] = clip
-            labels[s] = label_to_id[training_entry['label']]
-            print('labels[s]: ', labels[s])
-            print ('s: ', s)
-            print('labels: ', labels)
-        return batch, labels
+        clip = get_frames(path, frames_per_step, segment, im_size, sess)
+        batch[s, :, :, :, :] = clip
+        labels[s] = label_to_id[training_entry['label']]
+        print('label: ', label)
+        print('labels[s]: ', labels[s])
+        print ('s: ', s)
+        print('labels: ', labels)
+    return batch, labels

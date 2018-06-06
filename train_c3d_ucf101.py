@@ -198,6 +198,7 @@ def run_training():
     # Create a saver for writing training checkpoints.
     # saver = tf.train.Saver(list(weights.values()) + (list(biases.values())))
 
+    # Exclude the output layer from the training 
     wVals = []
     for v in weights.values():
         print (v)
@@ -240,6 +241,7 @@ def run_training():
                       # shuffle=True
                       sess = sess
                       )
+      print('Batch_size: ', Batch_size)
       sess.run(train_op, feed_dict={
                       images_placeholder: train_images,
                       labels_placeholder: train_labels
