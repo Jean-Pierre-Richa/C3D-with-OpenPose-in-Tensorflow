@@ -1,0 +1,501 @@
+{
+  "S1_Directions 1.55011271.mp4": [
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              1120,
+              1775
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder flexion",
+          "milliseconds": [
+              915,
+              1674
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder internal rotation and elbow flexion",
+          "milliseconds": [
+              2645,
+              3523
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder external rotation",
+          "milliseconds": [
+              4005,
+              5586
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder flexion",
+          "milliseconds": [
+              5697,
+              6390
+          ]
+      },
+      {
+          "label": "r-arm:Elbow extension",
+          "milliseconds": [
+              8748,
+              9386
+          ]
+      },
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              9220,
+              9996
+          ]
+      },
+      {
+          "label": "r-arm:Elbow extension",
+          "milliseconds": [
+              10052,
+              10496
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder extension",
+          "milliseconds": [
+              11966,
+              12715
+          ]
+      },
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              11966,
+              12410
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder adduction",
+          "milliseconds": [
+              12243,
+              12659
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder internal rotation",
+          "milliseconds": [
+              12632,
+              12881
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder flexion",
+          "milliseconds": [
+              12798,
+              13436
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder extension",
+          "milliseconds": [
+              13353,
+              13880
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder external rotation",
+          "milliseconds": [
+              13769,
+              14629
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder abduction",
+          "milliseconds": [
+              14463,
+              15073
+          ]
+      },
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              14879,
+              15322
+          ]
+      },
+      {
+          "label": "r-arm:Elbow extension",
+          "milliseconds": [
+              15322,
+              15600
+          ]
+      },
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              17320,
+              17847
+          ]
+      },
+      {
+          "label": "r-arm:Elbow extension",
+          "milliseconds": [
+              18263,
+              18679
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder adduction",
+          "milliseconds": [
+              18207,
+              19067
+          ]
+      },
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              18845,
+              19400
+          ]
+      },
+      {
+          "label": "r-arm:Elbow extension",
+          "milliseconds": [
+              19594,
+              19983
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder abduction",
+          "milliseconds": [
+              21897,
+              22674
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder external rotation",
+          "milliseconds": [
+              22008,
+              22646
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder internal rotation",
+          "milliseconds": [
+              22452,
+              23312
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder external rotation",
+          "milliseconds": [
+              23312,
+              23866
+          ]
+      },
+      {
+          "label": "r-arm:Elbow flexion",
+          "milliseconds": [
+              23977,
+              24522
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder adduction",
+          "milliseconds": [
+              25420,
+              25836
+          ]
+      },
+      {
+          "label": "r-arm:Shoulder external rotation",
+          "milliseconds": [
+              26030,
+              26640
+          ]
+      },
+      {
+          "label": "r-arm:Elbow extension",
+          "milliseconds": [
+              26335,
+              26696
+          ]
+      },
+      {
+          "label": "l-arm:Elbow flexion",
+          "milliseconds": [
+              814,
+              1647
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder flexion",
+          "milliseconds": [
+              2257,
+              3162
+          ]
+      },
+      {
+          "label": "l-arm:Elbow extension",
+          "milliseconds": [
+              2534,
+              3190
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder external rotation",
+          "milliseconds": [
+              5974,
+              7084
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder internal rotation",
+          "milliseconds": [
+              8915,
+              9691
+          ]
+      },
+      {
+          "label": "l-arm:Elbow flexion",
+          "milliseconds": [
+              9386,
+              9996
+          ]
+      },
+      {
+          "label": "l-arm:Elbow extension",
+          "milliseconds": [
+              10024,
+              10523
+          ]
+      },
+      {
+          "label": "l-arm:Elbow flexion",
+          "milliseconds": [
+              12021,
+              12438
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder external rotation",
+          "milliseconds": [
+              11994,
+              12576
+          ]
+      },
+      {
+          "label": "l-arm:Elbow extension",
+          "milliseconds": [
+              12410,
+              12743
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder adduction",
+          "milliseconds": [
+              13686,
+              14657
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder internal rotation",
+          "milliseconds": [
+              14185,
+              14601
+          ]
+      },
+      {
+          "label": "l-arm:Elbow flexion",
+          "milliseconds": [
+              14185,
+              14657
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder flexion",
+          "milliseconds": [
+              14573,
+              15073
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder extension",
+          "milliseconds": [
+              15960,
+              17209
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder external rotation",
+          "milliseconds": [
+              21508,
+              22913
+          ]
+      },
+      {
+          "label": "l-arm:Shoulder flexion",
+          "milliseconds": [
+              25697,
+              26002
+          ]
+      },
+      {
+          "label": "l-arm:Elbow extension",
+          "milliseconds": [
+              26363,
+              26890
+          ]
+      },
+      {
+          "label": "head:Lean forward",
+          "milliseconds": [
+              676,
+              1147
+          ]
+      },
+      {
+          "label": "head:Roll right",
+          "milliseconds": [
+              1480,
+              1924
+          ]
+      },
+      {
+          "label": "head:Turn left",
+          "milliseconds": [
+              6390,
+              6695
+          ]
+      },
+      {
+          "label": "head:Turn right",
+          "milliseconds": [
+              6806,
+              7444
+          ]
+      },
+      {
+          "label": "head:Turn left",
+          "milliseconds": [
+              8415,
+              9580
+          ]
+      },
+      {
+          "label": "head:Raise the head",
+          "milliseconds": [
+              10634,
+              11494
+          ]
+      },
+      {
+          "label": "head:Turn left",
+          "milliseconds": [
+              11827,
+              12770
+          ]
+      },
+      {
+          "label": "head:Turn right",
+          "milliseconds": [
+              12927,
+              14352
+          ]
+      },
+      {
+          "label": "head:Turn left",
+          "milliseconds": [
+              15073,
+              15822
+          ]
+      },
+      {
+          "label": "head:Roll left",
+          "milliseconds": [
+              19373,
+              19789
+          ]
+      },
+      {
+          "label": "head:Turn top-right",
+          "milliseconds": [
+              21370,
+              21915
+          ]
+      },
+      {
+          "label": "head:Raise the head",
+          "milliseconds": [
+              21897,
+              22368
+          ]
+      },
+      {
+          "label": "head:Turn bottom-left",
+          "milliseconds": [
+              25309,
+              26103
+          ]
+      },
+      {
+          "label": "r-leg:Knee extension",
+          "milliseconds": [
+              343,
+              925
+          ]
+      },
+      {
+          "label": "r-leg:Hip flexion",
+          "milliseconds": [
+              5669,
+              6085
+          ]
+      },
+      {
+          "label": "r-leg:Knee flexion",
+          "milliseconds": [
+              5669,
+              6030
+          ]
+      },
+      {
+          "label": "r-leg:Knee extension",
+          "milliseconds": [
+              6030,
+              6224
+          ]
+      },
+      {
+          "label": "r-leg:Hip extension",
+          "milliseconds": [
+              5919,
+              6057
+          ]
+      },
+      {
+          "label": "r-leg:Hip internal rotation",
+          "milliseconds": [
+              5697,
+              6057
+          ]
+      },
+      {
+          "label": "r-leg:Hip external rotation",
+          "milliseconds": [
+              6168,
+              7333
+          ]
+      },
+      {
+          "label": "r-leg:Hip internal rotation",
+          "milliseconds": [
+              9025,
+              9404
+          ]
+      },
+      {
+          "label": "r-leg:Hip external rotation",
+          "milliseconds": [
+              9414,
+              9691
+          ]
+      }
+  ]
+}
