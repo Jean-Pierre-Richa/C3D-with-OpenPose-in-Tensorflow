@@ -7,14 +7,23 @@ import pprint
 import sys
 from numpy import *
 from os.path import dirname, realpath
+import PoseEstimation
+import pose_list
+
 dir_path = dirname(realpath(__file__))
 print('dir_path: ' + dir_path)
 project_path = realpath(dir_path + '/..')
-print('project_path' + project_path)
+print('project_path: ' + project_path)
 libs_dir_path = dir_path+ '/openpose'
-print('libs_dir_path' + libs_dir_path)
+print('libs_dir_path: ' + libs_dir_path)
 sys.path.append('libs_dir_path' + libs_dir_path)
-import PoseEstimation
+
+# Paths
+json_path = 'json/'
+video_path = 'H3.6M/'
+
+# Create list of activities and IDs
+activities_ids = pose_list.generate_activity_list()
 
 def get_frames(video_path, frames_per_step, segment, im_size, sess):
     #load video and acquire its parameters usingopencv
@@ -49,65 +58,23 @@ def get_frames(video_path, frames_per_step, segment, im_size, sess):
 
     return frames
 
-def read_clip_and_label(Batch_size, trainin, frames_per_step, im_size, sess):
+def read_clip_and_label(Batch_size, frames_per_step, im_size, sess):
     batch = np.zeros(shape=(Batch_size, frames_per_step, im_size, im_size, 3), dtype=float)
     labels = np.zeros(shape=(Batch_size), dtype=int)
-    print ('labels: ', labels)
-    print ('Training: ', trainin)
+
     for s in range(Batch_size):
-        if trainin == 1:
-            with open('dataset_training.json') as file:
-                Json_dict = json.load(file)
-                entry_to_path = 'H3.6M/train/'
-                entry_name = random.choice(list(Json_dict.keys()))
-                print('entry name: ', entry_name)
-                training_entry = random.choice(Json_dict[entry_name])
-                print('training entry:', training_entry)
-                path = entry_to_path + entry_name
+        with open(json_path + 'dataset_training.json') as file:
+            Json_dict = json.load(file)
+            video_name = random.choice(list(Json_dict.keys()))
+            activity = random.choice(Json_dict[video_name])
 
-                labels_list = []
-                c = 0
+        segment = activity['milliseconds']
 
-                # Append the labels 1 time to have the classes labels
-                for label in Json_dict[entry_name]:
-                    print(label)
-                    if (label['label'] not in labels_list):
-                        labels_list.append(label['label'])
-                        c = c+1
-                print(c, 'labels_list')
-                # id_to_label = dict(enumerate(labels))
-                # print ('ID to labels: ', id_to_label )
-        elif trainin == 2:
-            with open('dataset_test.json') as file:
-                Json_dict = json.load(file)
-                entry_to_path = 'H3.6M/test/'
-                entry_name = random.choice(list(Json_dict.keys()))
-                print('entry name: ', entry_name)
-                training_entry = random.choice(Json_dict[entry_name])
-                print('training entry:', training_entry)
-                path = entry_to_path + entry_name
-
-                labels_list = []
-                c = 0
-
-                # Append the labels 1 time to have the classes labels
-                for label in Json_dict[entry_name]:
-                    print(label)
-                    if (label['label'] not in labels_list):
-                        labels_list.append(label['label'])
-                        c = c+1
-                print(c, 'labels_list')
-                # id_to_label = dict(enumerate(labels))
-                # print ('ID to labels: ', id_to_label )
-        label_to_id = dict(map(reversed, enumerate(labels_list)))
-        print('label to ID: ', label_to_id)
-
-        segment = training_entry['milliseconds']
-
-        clip = get_frames(path, frames_per_step, segment, im_size, sess)
+        clip = get_frames(video_path+video_name, frames_per_step, segment, im_size, sess)
         batch[s, :, :, :, :] = clip
-        labels[s] = label_to_id[training_entry['label']]
-        print('labels[s]: ', labels[s])
-        print ('s: ', s)
-        print('labels: ', labels)
+        labels[s] = activities_ids[activity['label']]
+        # print('label: ', label)
+        # print('labels[s]: ', labels[s])
+        # print ('s: ', s)
+        # print('labels: ', labels)
     return batch, labels
