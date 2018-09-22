@@ -19,14 +19,16 @@ net, _, last_layer = get_network(model, input_node, None)
 
 def compute_pose_frame(input_image, sess):
     image = cv2.resize(input_image, dsize=(input_height, input_width), interpolation=cv2.INTER_CUBIC)
-    print(image)
+    # print(image)
     global first_time
     if first_time:
         #load pretrained weights
-        print(first_time)
+        # print(first_time)
         # s = '%dx%d' % (input_node.shape[2], input_node.shape[1])
-        ckpts = '/Users/jeanpierrericha/Desktop/C3D elective in AI new/C3D-tensorflow/openpose/models/trained/mobilenet_368x368/model-release'
-
+        ckpts = '/Users/jeanpierrericha/Desktop/C3D-elective-in-AI-new/C3D-tensorflow/openpose/models/trained/mobilenet_368x368/model-release'
+        ckptss = '/Users/jeanpierrericha/Desktop/C3D-with-OpenPose-in-Tensorflow/models'
+        varss_in_ckpts = tf.train.list_variables(ckptss)
+        print('vars in new ckpts: ', varss_in_ckpts)
         vars_in_checkpoint = tf.train.list_variables(ckpts)
         # print('vars_in_checkpoint: ', vars_in_checkpoint)
         var_rest = []
@@ -36,7 +38,7 @@ def compute_pose_frame(input_image, sess):
         variables = tf.contrib.slim.get_variables_to_restore()
         # print('variables: ', variables)
         var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        print(var_list)
+        # print('var_list: ', var_list)
         # var_list = []
         # for v in variables:
         #     # print ('variable: ' + v)
@@ -60,7 +62,7 @@ def compute_pose_frame(input_image, sess):
         [
             net.get_output(name=last_layer.format(stage=stage_level, aux=1)),
             net.get_output(name=last_layer.format(stage=stage_level, aux=2))
-        ], feed_dict={'image:0': [image]}, options=run_options, run_metadata=run_metadata
+        ], feed_dict={'image:0': [image]}
     )
     tl = timeline.Timeline(run_metadata.step_stats)
     ctf = tl.generate_chrome_trace_format()
@@ -68,5 +70,7 @@ def compute_pose_frame(input_image, sess):
     humans = estimate_pose(heatMat, pafMat)
     pose_image = np.zeros(tuple(image.shape), dtype=np.uint8)
     pose_image = draw_humans(pose_image, humans)
+
+    cv2.imwrite('test.png', pose_image)
 
     return pose_image

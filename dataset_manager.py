@@ -49,42 +49,65 @@ def get_frames(video_path, frames_per_step, segment, im_size, sess):
 
     return frames
 
-def read_clip_and_label(Batch_size, frames_per_step, im_size, sess):
+def read_clip_and_label(Batch_size, trainin, frames_per_step, im_size, sess):
     batch = np.zeros(shape=(Batch_size, frames_per_step, im_size, im_size, 3), dtype=float)
     labels = np.zeros(shape=(Batch_size), dtype=int)
-    print ('labels: ', labels)
+    # print ('labels: ', labels)
+    # print ('Training: ', trainin)
     for s in range(Batch_size):
-        with open('dataset_training.json') as file:
-            Json_dict = json.load(file)
-            entry_name = random.choice(list(Json_dict.keys()))
-            print('entry name: ', entry_name)
-            training_entry = random.choice(Json_dict[entry_name])
-            print('training entry:', training_entry)
-            entry_to_path = 'H3.6M/'
-            path = entry_to_path + entry_name
+        if trainin == 1:
+            with open('dataset_training.json') as file:
+                Json_dict = json.load(file)
+                entry_to_path = 'H3.6M/train/'
+                entry_name = random.choice(list(Json_dict.keys()))
+                # print('entry name: ', entry_name)
+                training_entry = random.choice(Json_dict[entry_name])
+                # print('training entry:', training_entry)
+                path = entry_to_path + entry_name
 
-            labels_list = []
-            c = 0
+                labels_list = []
+                c = 0
 
-            # Append the labels 1 time to have the classes labels
-            for label in Json_dict[entry_name]:
-                print(label)
-                if (label['label'] not in labels_list):
-                    labels_list.append(label['label'])
-                    c = c+1
-            print(c, 'labels_list')
-            # id_to_label = dict(enumerate(labels))
-            # print ('ID to labels: ', id_to_label )
+                # Append the labels 1 time to have the classes labels
+                for label in Json_dict[entry_name]:
+                    # print(label)
+                    if (label['label'] not in labels_list):
+                        labels_list.append(label['label'])
+                        c = c+1
+                # print(c, 'labels_list')
+                # id_to_label = dict(enumerate(labels))
+                # print ('ID to labels: ', id_to_label )
+        elif trainin == 2:
+            with open('dataset_test.json') as file:
+                Json_dict = json.load(file)
+                entry_to_path = 'H3.6M/test/'
+                entry_name = random.choice(list(Json_dict.keys()))
+                # print('entry name: ', entry_name)
+                training_entry = random.choice(Json_dict[entry_name])
+                # print('training entry:', training_entry)
+                path = entry_to_path + entry_name
+
+                labels_list = []
+                c = 0
+
+                # Append the labels 1 time to have the classes labels
+                for label in Json_dict[entry_name]:
+                    # print(label)
+                    if (label['label'] not in labels_list):
+                        labels_list.append(label['label'])
+                        c = c+1
+                # print(c, 'labels_list')
+                # id_to_label = dict(enumerate(labels))
+                # print ('ID to labels: ', id_to_label )
         label_to_id = dict(map(reversed, enumerate(labels_list)))
-        print('label to ID: ', label_to_id)
+        # print('label to ID: ', label_to_id)
 
         segment = training_entry['milliseconds']
 
         clip = get_frames(path, frames_per_step, segment, im_size, sess)
         batch[s, :, :, :, :] = clip
         labels[s] = label_to_id[training_entry['label']]
-        print('label: ', label)
-        print('labels[s]: ', labels[s])
-        print ('s: ', s)
-        print('labels: ', labels)
+        # print('labels[s]: ', labels[s])
+        # print ('s: ', s)
+        # print('labels: ', labels)
     return batch, labels

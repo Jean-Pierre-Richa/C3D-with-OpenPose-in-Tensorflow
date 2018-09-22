@@ -117,6 +117,7 @@ def run_training():
   model_filename = "sports1m_finetuning_ucf101.model"
 
   with tf.name_scope('c3d'):
+  # with tf.Graph().as_default():
     global_step = tf.get_variable(
                     'global_step',
                     [],
@@ -196,32 +197,51 @@ def run_training():
     null_op = tf.no_op()
 
     # Create a saver for writing training checkpoints.
-    # saver = tf.train.Saver(list(weights.values()) + (list(biases.values())))
 
-    # Exclude the output layer from the training 
-    wVals = []
-    for v in weights.values():
-        print (v)
-        if v.name != 'var_name/wout:0':
-            wVals.append(v)
-    print ('weightsVals: ', wVals)
 
-    bVals = []
-    for k in biases.values():
-        print (k)
-        if k.name != 'var_name/bout:0':
-            bVals.append(k)
-    print ('biasesVals: ', bVals)
+    # 4
+    # Exclude the output layer from the training
+    # wVals = []
+    # for v in weights.values():
+    #     # print (v)
+    #     if v.name != 'var_name/wout:0':
+    #         wVals.append(v)
+    # print ('weightsVals: ', wVals)
+    #
+    # bVals = []
+    # for k in biases.values():
+    #     # print (k)
+    #     if k.name != 'var_name/bout:0':
+    #         bVals.append(k)
+    # print ('biasesVals: ', bVals)
 
-    saver = tf.train.Saver(list(wVals)+ (list(bVals)))
-    print(saver)
+
+    # variables_exclude = ['var_name/wout:0', 'var_name/bout:0']
+    # saver = tf.train.Saver(list(wVals)+ (list(bVals)))
+
+    # varss_list=tf.contrib.framework.get_variables_to_restore(include=None, exclude=['var_name/wout', 'var_name/bout'])
+    varss_list=tf.contrib.framework.get_variables_to_restore(include=None, exclude=None)
+    saver = tf.train.Saver(varss_list)
+
+
+    # Common
+    # print(saver)
+
+    # Original
+    # saver = tf.train.Saver(list(weights.values()) + list(biases.values()))
+    #
+    # print ('new_weights: ', wVals)
+    # print ('new_biases: ', bVals)
     init = tf.global_variables_initializer()
+
 
     # Create a session for running Ops on the Graph.
     sess = tf.Session(
                     config=tf.ConfigProto(allow_soft_placement=True)
                     )
     sess.run(init)
+    # saver.save(sess, 'test')
+
     if os.path.isfile(model_filename) and use_pretrained_model:
       saver.restore(sess, model_filename)
 
@@ -229,11 +249,15 @@ def run_training():
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./visual_logs/train', sess.graph)
     test_writer = tf.summary.FileWriter('./visual_logs/test', sess.graph)
+    # training = True
     for step in xrange(FLAGS.max_steps):
       start_time = time.time()
+      Batch_size=FLAGS.batch_size * gpu_num
       train_images, train_labels = input_data.read_clip_and_label(
+                      # path = path,
                       # filename='/Users/jeanpierrericha/Desktop/C3D elective in AI new/C3D-tensorflow/list/train.list',
-                      Batch_size=FLAGS.batch_size * gpu_num,
+                      Batch_size = Batch_size,
+                      trainin = 1,
                       # num_frames_per_clip=c3d_model.NUM_FRAMES_PER_CLIP,
                       frames_per_step = c3d_model.NUM_FRAMES_PER_CLIP,
                       # crop_size=c3d_model.CROP_SIZE,
@@ -241,7 +265,7 @@ def run_training():
                       # shuffle=True
                       sess = sess
                       )
-      print('Batch_size: ', Batch_size)
+      print(Batch_size)
       sess.run(train_op, feed_dict={
                       images_placeholder: train_images,
                       labels_placeholder: train_labels
@@ -261,9 +285,12 @@ def run_training():
         print ("accuracy: " + "{:.5f}".format(acc))
         train_writer.add_summary(summary, step)
         print('Validation Data Eval:')
+        # training = False
         val_images, val_labels = input_data.read_clip_and_label(
+                         # path = path,
                          # filename='/Users/jeanpierrericha/Desktop/C3D elective in AI new/C3D-tensorflow/list/train.list',
                          Batch_size=FLAGS.batch_size * gpu_num,
+                         trainin = 2,
                          # num_frames_per_clip=c3d_model.NUM_FRAMES_PER_CLIP,
                          frames_per_step = c3d_model.NUM_FRAMES_PER_CLIP,
                          # crop_size=c3d_model.CROP_SIZE,
