@@ -28,12 +28,13 @@ import numpy as np
 # Basic model parameters as external flags.
 flags = tf.app.flags
 gpu_num = 2
+
 #flags.DEFINE_float('learning_rate', 0.0, 'Initial learning rate.')
 flags.DEFINE_integer('max_steps', 5000, 'Number of steps to run trainer.')
 flags.DEFINE_integer('batch_size', 10, 'Batch size.')
 FLAGS = flags.FLAGS
 MOVING_AVERAGE_DECAY = 0.9999
-model_save_dir = './models'
+model_save_dir = './checkpoint'
 
 def placeholder_inputs(batch_size):
   """Generate placeholder variables to represent the input tensors.
@@ -113,8 +114,11 @@ def run_training():
   # Create model directory
   if not os.path.exists(model_save_dir):
       os.makedirs(model_save_dir)
-  use_pretrained_model = True
-  model_filename = "sports1m_finetuning_ucf101.model"
+      use_pretrained_model = True
+  else:
+      use_pretrained_model = False
+  model_filename = "model/sports1m_finetuning_ucf101.model"
+  new_model_filename = "checkpoint/"
 
   with tf.name_scope('c3d'):
   # with tf.Graph().as_default():
@@ -159,6 +163,7 @@ def run_training():
               'bd2': _variable_with_weight_decay('bd2', [4096], 0.000),
               'out': _variable_with_weight_decay('bout', [c3d_model.NUM_CLASSES], 0.000),
               }
+
     print ('num_classes: ', c3d_model.NUM_CLASSES)
     for gpu_index in range(0, gpu_num):
       with tf.device('/gpu:%d' % gpu_index):
@@ -193,47 +198,19 @@ def run_training():
     apply_gradient_op2 = opt_finetuning.apply_gradients(grads2, global_step=global_step)
     variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY)
     variables_averages_op = variable_averages.apply(tf.trainable_variables())
-    train_op = tf.group(apply_gradient_op1, apply_gradient_op2, variables_averages_op)
+
+    train_op = tf.group(apply_gradient_op2, variables_averages_op)
+    full_layers_train_op = tf.group(apply_gradient_op1, apply_gradient_op2, variables_averages_op)
     null_op = tf.no_op()
 
     # Create a saver for writing training checkpoints.
 
-
-    # 4
-    # Exclude the output layer from the training
-    # wVals = []
-    # for v in weights.values():
-    #     # print (v)
-    #     if v.name != 'var_name/wout:0':
-    #         wVals.append(v)
-    # print ('weightsVals: ', wVals)
-    #
-    # bVals = []
-    # for k in biases.values():
-    #     # print (k)
-    #     if k.name != 'var_name/bout:0':
-    #         bVals.append(k)
-    # print ('biasesVals: ', bVals)
-
-
-    # variables_exclude = ['var_name/wout:0', 'var_name/bout:0']
-    # saver = tf.train.Saver(list(wVals)+ (list(bVals)))
-
-    # varss_list=tf.contrib.framework.get_variables_to_restore(include=None, exclude=['var_name/wout', 'var_name/bout'])
     varss_list=tf.contrib.framework.get_variables_to_restore(include=None, exclude=None)
     saver = tf.train.Saver(varss_list)
+    # saver_variables = varss_list(scope='var_name')
+    # saver = tf.train.Saver(saver_variables)
 
-
-    # Common
-    # print(saver)
-
-    # Original
-    # saver = tf.train.Saver(list(weights.values()) + list(biases.values()))
-    #
-    # print ('new_weights: ', wVals)
-    # print ('new_biases: ', bVals)
     init = tf.global_variables_initializer()
-
 
     # Create a session for running Ops on the Graph.
     sess = tf.Session(
@@ -244,37 +221,43 @@ def run_training():
 
     if os.path.isfile(model_filename) and use_pretrained_model:
       saver.restore(sess, model_filename)
+    else:
+      saver.restore(sess, tf.train.latest_checkpoint(new_model_filename))
+      ckpt = tf.train.get_checkpoint_state(new_model_filename)
+      # Extract from checkpoint filename
+      step = int(os.path.basename(ckpt.model_checkpoint_path).split('-')[1])+1
+      print("step number: ", step)
 
     # Create summary writter
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./visual_logs/train', sess.graph)
     test_writer = tf.summary.FileWriter('./visual_logs/test', sess.graph)
-    # training = True
-    for step in xrange(FLAGS.max_steps):
+    while step < FLAGS.max_steps:
       start_time = time.time()
       Batch_size=FLAGS.batch_size * gpu_num
       train_images, train_labels = input_data.read_clip_and_label(
-                      # path = path,
-                      # filename='/Users/jeanpierrericha/Desktop/C3D elective in AI new/C3D-tensorflow/list/train.list',
                       Batch_size = Batch_size,
-                      trainin = 1,
-                      # num_frames_per_clip=c3d_model.NUM_FRAMES_PER_CLIP,
                       frames_per_step = c3d_model.NUM_FRAMES_PER_CLIP,
-                      # crop_size=c3d_model.CROP_SIZE,
                       im_size=c3d_model.CROP_SIZE,
-                      # shuffle=True
                       sess = sess
                       )
-      print(Batch_size)
-      sess.run(train_op, feed_dict={
-                      images_placeholder: train_images,
-                      labels_placeholder: train_labels
-                      })
-      duration = time.time() - start_time
+      print('batch size: ', Batch_size)
+      if step < 1000:
+          sess.run(train_op, feed_dict={
+                          images_placeholder: train_images,
+                          labels_placeholder: train_labels
+                          })
+          duration = time.time() - start_time
+      else:
+          sess.run(full_layers_train_op, feed_dict={
+                          images_placeholder: train_images,
+                          labels_placeholder: train_labels
+                          })
+          duration = time.time() - start_time
       print('Step %d: %.3f sec' % (step, duration))
-
+      step = step+1
       # Save a checkpoint and evaluate the model periodically.
-      if (step) % 10 == 0 or (step + 1) == FLAGS.max_steps:
+      if (step-1) % 10 == 0 or (step + 1) == FLAGS.max_steps:
         saver.save(sess, os.path.join(model_save_dir, 'c3d_ucf_model'), global_step=step)
         print('Training Data Eval:')
         summary, acc = sess.run(
@@ -282,21 +265,17 @@ def run_training():
                         feed_dict={images_placeholder: train_images,
                             labels_placeholder: train_labels
                             })
+
         print ("accuracy: " + "{:.5f}".format(acc))
         train_writer.add_summary(summary, step)
         print('Validation Data Eval:')
         # training = False
         val_images, val_labels = input_data.read_clip_and_label(
-                         # path = path,
-                         # filename='/Users/jeanpierrericha/Desktop/C3D elective in AI new/C3D-tensorflow/list/train.list',
                          Batch_size=FLAGS.batch_size * gpu_num,
-                         trainin = 2,
-                         # num_frames_per_clip=c3d_model.NUM_FRAMES_PER_CLIP,
                          frames_per_step = c3d_model.NUM_FRAMES_PER_CLIP,
-                         # crop_size=c3d_model.CROP_SIZE,
                          im_size=c3d_model.CROP_SIZE,
-                         # shuffle=True
-                         sess = sess
+                         sess = sess,
+                         test=True
                         )
         summary, acc = sess.run(
                         [merged, accuracy],

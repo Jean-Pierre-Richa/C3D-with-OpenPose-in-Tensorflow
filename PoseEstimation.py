@@ -26,7 +26,7 @@ def compute_pose_frame(input_image, sess):
         # print(first_time)
         # s = '%dx%d' % (input_node.shape[2], input_node.shape[1])
         ckpts = '/Users/jeanpierrericha/Desktop/C3D-elective-in-AI-new/C3D-tensorflow/openpose/models/trained/mobilenet_368x368/model-release'
-        ckptss = '/Users/jeanpierrericha/Desktop/C3D-with-OpenPose-in-Tensorflow/models'
+        ckptss = '/Users/jeanpierrericha/Desktop/C3D-with-OpenPose-in-Tensorflow/checkpoint'
         varss_in_ckpts = tf.train.list_variables(ckptss)
         print('vars in new ckpts: ', varss_in_ckpts)
         vars_in_checkpoint = tf.train.list_variables(ckpts)
@@ -38,16 +38,6 @@ def compute_pose_frame(input_image, sess):
         variables = tf.contrib.slim.get_variables_to_restore()
         # print('variables: ', variables)
         var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
-        # print('var_list: ', var_list)
-        # var_list = []
-        # for v in variables:
-        #     # print ('variable: ' + v)
-        #     name = v.name.split(':')[0]
-        #     if 'Mobilenet' or 'Openpose' in var_rest:
-        #         var_list.append(name)
-        # print ('var_list')
-        # print (var_list)
-
 
         loader = tf.train.Saver(var_list=var_list)
         loader.restore(sess, ckpts)
