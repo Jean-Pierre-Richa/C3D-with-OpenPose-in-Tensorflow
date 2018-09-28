@@ -24,6 +24,7 @@ import dataset_manager as input_data
 import c3d_model
 import math
 import numpy as np
+import read_tfRecords
 
 # Basic model parameters as external flags.
 flags = tf.app.flags
@@ -35,6 +36,7 @@ flags.DEFINE_integer('batch_size', 10, 'Batch size.')
 FLAGS = flags.FLAGS
 MOVING_AVERAGE_DECAY = 0.9999
 model_save_dir = './checkpoint'
+ckpt_saved = 'checkpoint/checkpoint'
 
 def placeholder_inputs(batch_size):
   """Generate placeholder variables to represent the input tensors.
@@ -114,11 +116,12 @@ def run_training():
   # Create model directory
   if not os.path.exists(model_save_dir):
       os.makedirs(model_save_dir)
+  if not os.path.exists(ckpt_saved):
       use_pretrained_model = True
+      model_filename = "model/sports1m_finetuning_ucf101.model"
   else:
       use_pretrained_model = False
-  model_filename = "model/sports1m_finetuning_ucf101.model"
-  new_model_filename = "checkpoint/"
+      model_filename = "checkpoint/"
 
   with tf.name_scope('c3d'):
   # with tf.Graph().as_default():
@@ -199,34 +202,51 @@ def run_training():
     variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY)
     variables_averages_op = variable_averages.apply(tf.trainable_variables())
 
-    train_op = tf.group(apply_gradient_op2, variables_averages_op)
-    full_layers_train_op = tf.group(apply_gradient_op1, apply_gradient_op2, variables_averages_op)
+    last_layer_train_op = tf.group(apply_gradient_op2, variables_averages_op)
+    full_train_op = tf.group(apply_gradient_op1, apply_gradient_op2, variables_averages_op)
+
     null_op = tf.no_op()
 
-    # Create a saver for writing training checkpoints.
+    # Restore all the layers excluding the last one
+    exclude_variables = ['var_name/wout', 'var_name/bout']
+    restore_variables = [v.name for v in tf.trainable_variables(scope='var_name')]
+    # all_variables = tf.contrib.framework.get_variables_to_restore(exclude=exclude_variables + restore_variables)
 
-    varss_list=tf.contrib.framework.get_variables_to_restore(include=None, exclude=None)
-    saver = tf.train.Saver(varss_list)
-    # saver_variables = varss_list(scope='var_name')
-    # saver = tf.train.Saver(saver_variables)
-
-    init = tf.global_variables_initializer()
-
-    # Create a session for running Ops on the Graph.
-    sess = tf.Session(
-                    config=tf.ConfigProto(allow_soft_placement=True)
-                    )
-    sess.run(init)
-    # saver.save(sess, 'test')
-
-    if os.path.isfile(model_filename) and use_pretrained_model:
-      saver.restore(sess, model_filename)
+    variables_to_restore = tf.contrib.framework.get_variables_to_restore(include=restore_variables, exclude=exclude_variables)
+    if use_pretrained_model:
+      # saver.restore(sess, model_filename)
+      init_fn = tf.contrib.framework.assign_from_checkpoint_fn(model_filename, variables_to_restore)
+      step = 0
     else:
-      saver.restore(sess, tf.train.latest_checkpoint(new_model_filename))
-      ckpt = tf.train.get_checkpoint_state(new_model_filename)
+      # saver.restore(sess, tf.train.latest_checkpoint(new_model_filename))
+      init_fn = tf.contrib.framework.assign_from_checkpoint_fn(model_filename, variables_to_restore)
+      ckpt = tf.train.get_checkpoint_state(model_filename)
       # Extract from checkpoint filename
       step = int(os.path.basename(ckpt.model_checkpoint_path).split('-')[1])+1
       print("step number: ", step)
+
+
+    # Initialization operation from scratch for the new output layer
+    fout_variables = tf.contrib.framework.get_variables_by_suffix('out')
+    fc8_init = tf.variables_initializer(fout_variables)
+
+    # # Create a saver for writing training checkpoints.
+    saver_variables = tf.trainable_variables(scope='var_name')
+    saver = tf.train.Saver(saver_variables)
+
+    # Create a session for running Ops on the Graph.
+    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+
+    # Initialize all variables
+    sess.run(tf.global_variables_initializer())
+
+    # Load the pretrained weights
+    init_fn(sess)
+
+    # Initialize the weights
+    sess.run(fc8_init)
+
+
 
     # Create summary writter
     merged = tf.summary.merge_all()
@@ -235,10 +255,9 @@ def run_training():
     while step < FLAGS.max_steps:
       start_time = time.time()
       Batch_size=FLAGS.batch_size * gpu_num
-      train_images, train_labels = input_data.read_clip_and_label(
+      train_images, train_labels = read_tfRecords.extract_tfRecords(
                       Batch_size = Batch_size,
-                      frames_per_step = c3d_model.NUM_FRAMES_PER_CLIP,
-                      im_size=c3d_model.CROP_SIZE,
+                      phase = 'train',
                       sess = sess
                       )
       print('batch size: ', Batch_size)
@@ -270,12 +289,10 @@ def run_training():
         train_writer.add_summary(summary, step)
         print('Validation Data Eval:')
         # training = False
-        val_images, val_labels = input_data.read_clip_and_label(
-                         Batch_size=FLAGS.batch_size * gpu_num,
-                         frames_per_step = c3d_model.NUM_FRAMES_PER_CLIP,
-                         im_size=c3d_model.CROP_SIZE,
-                         sess = sess,
-                         test=True
+        val_images, val_labels = read_tfRecords.extract_tfRecords(
+                        Batch_size = Batch_size,
+                        phase = 'test',
+                        sess = sess
                         )
         summary, acc = sess.run(
                         [merged, accuracy],

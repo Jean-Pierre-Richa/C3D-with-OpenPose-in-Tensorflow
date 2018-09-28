@@ -17,7 +17,7 @@ print('libs_dir_path' + libs_dir_path)
 sys.path.append('libs_dir_path' + libs_dir_path)
 import PoseEstimation
 json_path = 'json/'
-entry_to_path = 'H3.6M/'
+entry_to_path = 'videos/'
 activities_ids = activities.activities_ids
 def get_frames(video_path, frames_per_step, segment, im_size, sess):
     # load video and acquire its parameters usingopencv
