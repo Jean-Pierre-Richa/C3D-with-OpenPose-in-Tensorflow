@@ -40,13 +40,17 @@ def generateDataset(file_json, kind):
                 segment2 = segment[1]
                 for key, label in primitive.items():
                     if key == 'label':
-                        print('label: ', label)
-                        for i, j in activities.activities_tfrecords.items():
-                            DIRECTORY= directory + kind + str(label)
-                            if not os.path.exists(DIRECTORY):
-                                os.makedirs(DIRECTORY)
-                            get_frames(DIRECTORY, vid_name, videos_path, label, activities.frames_per_step, segment2, segment1, activities.im_size, sess)
-                            break
+                        print('new label: ', label)
+                        for lbl, id in activities.activities_tfrecords.items():
+                            if label in lbl:
+                                print('lbl: ', lbl)
+                                print('id: ', id)
+                                DIRECTORY= directory + kind + str(label)
+                                if not os.path.exists(DIRECTORY):
+                                    os.makedirs(DIRECTORY)
+                                print('created :', DIRECTORY)
+                                get_frames(DIRECTORY, vid_name, videos_path, label, activities.frames_per_step, segment2, segment1, activities.im_size, sess)
+                                break
 def get_frames(DIRECTORY, vid_name, video_path, label, frames_per_step, segment2, segment1, im_size, sess):
     # load video and acquire its parameters usingopencv
     # video_path = '/H3.6M/Directions/S5_Directions 2.55011271.mp4'
