@@ -36,7 +36,7 @@ NUM_FRAMES_PER_CLIP = 16
 
 def conv3d(name, l_input, w, b):
   return tf.nn.bias_add(
-          tf.nn.conv3d(l_input, w, strides=[1, 1, 1, 1, 1], padding='SAME'),
+              tf.nn.conv3d(l_input, w, strides=[1, 1, 1, 1, 1], padding='SAME'),
           b
           )
 

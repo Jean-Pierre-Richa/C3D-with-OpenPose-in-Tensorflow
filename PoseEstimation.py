@@ -60,6 +60,6 @@ def compute_pose_frame(input_image, sess):
     pose_image = np.zeros(tuple(image.shape), dtype=np.uint8)
     pose_image = draw_humans(pose_image, humans)
 
-    cv2.imwrite('test.png', pose_image)
+    # cv2.imwrite('test.png', pose_image)
 
     return pose_image

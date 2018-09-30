@@ -246,8 +246,6 @@ def run_training():
     # Initialize the weights
     sess.run(fc8_init)
 
-
-
     # Create summary writter
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./visual_logs/train', sess.graph)

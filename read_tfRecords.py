@@ -3,15 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import activities
 
+frames_per_step = activities.frames_per_step
 path='tfrecords/'
 def extract_tfRecords(Batch_size, phase, sess):
 
     data_path = path + phase + '.tfrecords'
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
-    # sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-
-        feature={"image": tf.FixedLenFeature([], tf.string),
-                 'label': tf.FixedLenFeature([], tf.int64)}
 
         # Create a list of filenames and pass it to a queue
         # Define a reader and read the next record
@@ -19,18 +16,31 @@ def extract_tfRecords(Batch_size, phase, sess):
         filename_queue=tf.train.string_input_producer([data_path])
         reader=tf.TFRecordReader()
         _, serialized_example=reader.read(filename_queue)
-        features = tf.parse_single_example(serialized_example, features=feature)
 
-        # Convert the image from string back to numbers
-        # Cast label data into int32
+
+        feature = dict()
+        feature["class_label"] = tf.FixedLenFeature((), tf.int64)
+        for i in range(activities.frames_per_step):
+            feature["frames/{:02d}".format(i)] = tf.FixedLenFeature((), tf.string)
+
+        # Parse into tensors
+        parsed_features = tf.parse_single_example(serialized_example, feature)
+
+        # Decode the image
+        image = []
+        for i in range(activities.frames_per_step):
+            image.append(tf.image.decode_jpeg(parsed_features["frames/{:02d}".format(i)]))
+
+        # put the frames into a big tensor of shape (N,H,W,3)
+        image = tf.stack(image)
+        label = tf.cast(parsed_features['class_label'], tf.int64)
+
         # Reshape image into the original shape
-        image = tf.decode_raw(features['image'], tf.float32)
-        label = tf.cast(features['label'], tf.int32)
-        image = tf.reshape(image, [activities.im_size, activities.im_size, 3])
+        image = tf.reshape(image, [frames_per_step, activities.im_size, activities.im_size, 3])
 
         # Creates batches by randomly shuffling tensors
         images, labels = tf.train.shuffle_batch([image, label], batch_size=Batch_size,
-                                capacity=30, num_threads=1, min_after_dequeue=10)
+                                capacity=1000, num_threads=1, min_after_dequeue=100)
 
         # Initialize variables
         init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
@@ -38,7 +48,7 @@ def extract_tfRecords(Batch_size, phase, sess):
 
         # Create a coordinator and run all QueueRunner objects
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(coord=coord)
+        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         for batch_index in range(Batch_size):
             train_images, train_labels = sess.run([images, labels])
