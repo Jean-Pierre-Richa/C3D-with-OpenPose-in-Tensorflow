@@ -10,7 +10,7 @@ def extract_tfRecords(Batch_size, phase, sess):
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
     # sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
-        feature={'image': tf.FixedLenFeature([], tf.string),
+        feature={"image": tf.FixedLenFeature([], tf.string),
                  'label': tf.FixedLenFeature([], tf.int64)}
 
         # Create a list of filenames and pass it to a queue
@@ -33,25 +33,25 @@ def extract_tfRecords(Batch_size, phase, sess):
                                 capacity=30, num_threads=1, min_after_dequeue=10)
 
         # Initialize variables
-        # init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
-        # sess.run(init_op)
+        init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        sess.run(init_op)
 
         # Create a coordinator and run all QueueRunner objects
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
 
-        for batch_index in range(5):
-            img, lbl = sess.run([images, labels])
-            img = img.astype(np.uint8)
-
-            for j in range(6):
-                plt.subplot(2, 3, j+1)
-                plt.imshow(img[j, ...])
-                for i, k in activities.activities_tfrecords.items():
-                    if lbl[j]==k:
-                        plt.title(i)
-
-            plt.show()
+        for batch_index in range(Batch_size):
+            train_images, train_labels = sess.run([images, labels])
+            train_images = train_images.astype(np.uint8)
+        return train_images, train_labels
+            # for j in range(6):
+            #     plt.subplot(2, 3, j+1)
+            #     plt.imshow(train_images[j, ...])
+            #     for i, k in activities.activities_tfrecords.items():
+            #         if train_labels[j]==k:
+            #             plt.title(i)
+            #
+            # plt.show()
 
         # Stop the threads
         coord.request_stop()

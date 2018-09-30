@@ -45,7 +45,7 @@ def generateDataset(file_json, kind):
                             if label in lbl:
                                 print('lbl: ', lbl)
                                 print('id: ', id)
-                                DIRECTORY= directory + kind + str(label)
+                                DIRECTORY= directory + kind
                                 if not os.path.exists(DIRECTORY):
                                     os.makedirs(DIRECTORY)
                                 print('created :', DIRECTORY)

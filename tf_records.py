@@ -14,12 +14,15 @@ shuffle_data = True
 
 DATASET_DIR_TRAIN = 'images/train/'
 DATASET_DIR_TEST = 'images/test/'
-
+TFR_DIR = 'tfrecords/'
 # Read addresses and labels from the 'train' folder
 def create_tfRecords(DATASET_DIR, phase):
     labels = []
     labels = activities.activities_tfrecords
-    train_filename = 'tfrecords/' + phase + '.tfrecords'
+    train_filename = TFR_DIR + phase + '.tfrecords'
+    if not os.path.exists(TFR_DIR):
+        os.makedirs(TFR_DIR)
+
     if phase == 'train':
         # addrs = glob.glob(DATASET_DIR_TRAIN)
         addrs = DATASET_DIR_TRAIN

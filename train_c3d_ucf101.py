@@ -262,7 +262,7 @@ def run_training():
                       )
       print('batch size: ', Batch_size)
       if step < 1000:
-          sess.run(train_op, feed_dict={
+          sess.run(last_layer_train_op, feed_dict={
                           images_placeholder: train_images,
                           labels_placeholder: train_labels
                           })

@@ -4,6 +4,9 @@ from tensorflow.python.client import timeline
 from openpose.common import estimate_pose, draw_humans
 from openpose.networks import get_network
 import numpy as np
+import os
+
+cwd = os.getcwd()
 
 model = 'mobilenet'
 input_width = 368
@@ -23,12 +26,8 @@ def compute_pose_frame(input_image, sess):
     global first_time
     if first_time:
         #load pretrained weights
-        # print(first_time)
-        # s = '%dx%d' % (input_node.shape[2], input_node.shape[1])
-        ckpts = '/Users/jeanpierrericha/Desktop/C3D-elective-in-AI-new/C3D-tensorflow/openpose/models/trained/mobilenet_368x368/model-release'
-        ckptss = '/Users/jeanpierrericha/Desktop/C3D-with-OpenPose-in-Tensorflow/checkpoint'
-        varss_in_ckpts = tf.train.list_variables(ckptss)
-        print('vars in new ckpts: ', varss_in_ckpts)
+        ckpts = cwd + '/openpose/models/trained/mobilenet_368x368/model-release'
+
         vars_in_checkpoint = tf.train.list_variables(ckpts)
         # print('vars_in_checkpoint: ', vars_in_checkpoint)
         var_rest = []
