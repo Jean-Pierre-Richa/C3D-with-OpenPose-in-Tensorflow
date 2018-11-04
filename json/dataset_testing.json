@@ -7629,13 +7629,6 @@
             ]
         },
         {
-            "label": "l-leg:Knee flexion",
-            "milliseconds": [
-                29274,
-                29540
-            ]
-        },
-        {
             "label": "r-arm:Shoulder adduction",
             "milliseconds": [
                 502,
@@ -11091,104 +11084,6 @@
             "milliseconds": [
                 15102,
                 16351
-            ]
-        },
-        {
-            "label": "r-arm:Elbow extension",
-            "milliseconds": [
-                25352,
-                27353
-            ]
-        },
-        {
-            "label": "r-arm:Elbow extension",
-            "milliseconds": [
-                34352,
-                35601
-            ]
-        },
-        {
-            "label": "l-arm:Elbow flexion",
-            "milliseconds": [
-                12352,
-                13851
-            ]
-        },
-        {
-            "label": "l-arm:Elbow flexion",
-            "milliseconds": [
-                18102,
-                22851
-            ]
-        },
-        {
-            "label": "l-arm:Elbow flexion",
-            "milliseconds": [
-                26351,
-                28102
-            ]
-        },
-        {
-            "label": "l-arm:Elbow flexion",
-            "milliseconds": [
-                31602,
-                38852
-            ]
-        },
-        {
-            "label": "head:Lean forward",
-            "milliseconds": [
-                1101,
-                1602
-            ]
-        },
-        {
-            "label": "head:Lean forward",
-            "milliseconds": [
-                1602,
-                5103
-            ]
-        },
-        {
-            "label": "r-leg:Hip adduction",
-            "milliseconds": [
-                5762,
-                7012
-            ]
-        },
-        {
-            "label": "r-leg:Hip adduction",
-            "milliseconds": [
-                10762,
-                12514
-            ]
-        },
-        {
-            "label": "r-leg:Hip adduction",
-            "milliseconds": [
-                14512,
-                18762
-            ]
-        },
-        {
-            "label": "r-leg:Hip adduction",
-            "milliseconds": [
-                21513,
-                23512
-            ]
-        },
-        {
-            "label": "r-leg:Hip adduction",
-            "milliseconds": [
-                27513,
-                31013
-            ]
-        },
-        {
-            "label": "r-leg:Hip adduction",
-            "milliseconds": [
-                34264,
-                37513
             ]
         }
     ],

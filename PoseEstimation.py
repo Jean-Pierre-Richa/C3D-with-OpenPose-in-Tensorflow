@@ -21,27 +21,31 @@ net, _, last_layer = get_network(model, input_node, None)
 
 
 def compute_pose_frame(input_image, sess):
-    image = cv2.resize(input_image, dsize=(input_height, input_width), interpolation=cv2.INTER_CUBIC)
-    # print(image)
-    global first_time
-    if first_time:
-        #load pretrained weights
-        ckpts = cwd + '/openpose/models/trained/mobilenet_368x368/model-release'
+    try:
+        image = cv2.resize(input_image, dsize=(input_height, input_width), interpolation=cv2.INTER_CUBIC)
+        # print(image)
+        global first_time
+        if first_time:
+            #load pretrained weights
+            ckpts = cwd + '/openpose/models/trained/mobilenet_368x368/model-release'
 
-        vars_in_checkpoint = tf.train.list_variables(ckpts)
-        # print('vars_in_checkpoint: ', vars_in_checkpoint)
-        var_rest = []
-        for el in vars_in_checkpoint:
-            var_rest.append(el[0])
-        # print('var_rest: ', var_rest)
-        variables = tf.contrib.slim.get_variables_to_restore()
-        # print('variables: ', variables)
-        var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
+            vars_in_checkpoint = tf.train.list_variables(ckpts)
+            # print('vars_in_checkpoint: ', vars_in_checkpoint)
+            var_rest = []
+            for el in vars_in_checkpoint:
+                var_rest.append(el[0])
+            # print('var_rest: ', var_rest)
+            variables = tf.contrib.slim.get_variables_to_restore()
+            # print('variables: ', variables)
+            var_list = [v for v in variables if v.name.split(':')[0] in var_rest]
 
-        loader = tf.train.Saver(var_list=var_list)
-        loader.restore(sess, ckpts)
+            loader = tf.train.Saver(var_list=var_list)
+            loader.restore(sess, ckpts)
 
-        first_time = False
+            first_time = False
+    except (RuntimeError):
+        print("Error, couldn't generate pose")
+        pass
 
 
     vec = sess.run(net.get_output(name = 'concat_stage7'), feed_dict={'image:0': [image]})

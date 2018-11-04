@@ -30,7 +30,7 @@ import read_tfRecords
 flags = tf.app.flags
 gpu_num = 2
 
-#flags.DEFINE_float('learning_rate', 0.0, 'Initial learning rate.')
+flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
 flags.DEFINE_integer('max_steps', 5000, 'Number of steps to run trainer.')
 flags.DEFINE_integer('batch_size', 10, 'Batch size.')
 FLAGS = flags.FLAGS
@@ -121,7 +121,7 @@ def run_training():
       model_filename = "model/sports1m_finetuning_ucf101.model"
   else:
       use_pretrained_model = False
-      model_filename = "checkpoint/"
+      model_filename = "./checkpoint/"
 
   with tf.name_scope('c3d'):
   # with tf.Graph().as_default():
@@ -201,30 +201,13 @@ def run_training():
     apply_gradient_op2 = opt_finetuning.apply_gradients(grads2, global_step=global_step)
     variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY)
     variables_averages_op = variable_averages.apply(tf.trainable_variables())
-
-    last_layer_train_op = tf.group(apply_gradient_op2, variables_averages_op)
-    full_train_op = tf.group(apply_gradient_op1, apply_gradient_op2, variables_averages_op)
-
+    train_op = tf.group(apply_gradient_op1, apply_gradient_op2, variables_averages_op)
     null_op = tf.no_op()
 
     # Restore all the layers excluding the last one
     exclude_variables = ['var_name/wout', 'var_name/bout']
     restore_variables = [v.name for v in tf.trainable_variables(scope='var_name')]
     # all_variables = tf.contrib.framework.get_variables_to_restore(exclude=exclude_variables + restore_variables)
-
-    variables_to_restore = tf.contrib.framework.get_variables_to_restore(include=restore_variables, exclude=exclude_variables)
-    if use_pretrained_model:
-      # saver.restore(sess, model_filename)
-      init_fn = tf.contrib.framework.assign_from_checkpoint_fn(model_filename, variables_to_restore)
-      step = 0
-    else:
-      # saver.restore(sess, tf.train.latest_checkpoint(new_model_filename))
-      init_fn = tf.contrib.framework.assign_from_checkpoint_fn(model_filename, variables_to_restore)
-      ckpt = tf.train.get_checkpoint_state(model_filename)
-      # Extract from checkpoint filename
-      step = int(os.path.basename(ckpt.model_checkpoint_path).split('-')[1])+1
-      print("step number: ", step)
-
 
     # Initialization operation from scratch for the new output layer
     fout_variables = tf.contrib.framework.get_variables_by_suffix('out')
@@ -236,6 +219,19 @@ def run_training():
 
     # Create a session for running Ops on the Graph.
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+
+    variables_to_restore = tf.contrib.framework.get_variables_to_restore(include=restore_variables, exclude=exclude_variables)
+    if use_pretrained_model:
+      # saver.restore(sess, model_filename)
+      init_fn = tf.contrib.framework.assign_from_checkpoint_fn(model_filename, variables_to_restore)
+      step = 0
+    else:
+      # saver.restore(sess, tf.train.latest_checkpoint(new_model_filename))
+      ckpt = tf.train.get_checkpoint_state(model_filename)
+      # Extract from checkpoint filename
+      step = int(os.path.basename(ckpt.model_checkpoint_path).split('-')[1])+1
+      init_fn = tf.contrib.framework.assign_from_checkpoint_fn(model_filename+"c3d_ucf_model-"+str(step-1), variables_to_restore)
+      print("step number: ", step)
 
     # Initialize all variables
     sess.run(tf.global_variables_initializer())
@@ -259,23 +255,16 @@ def run_training():
                       sess = sess
                       )
       print('batch size: ', Batch_size)
-      if step < 1000:
-          sess.run(last_layer_train_op, feed_dict={
-                          images_placeholder: train_images,
-                          labels_placeholder: train_labels
-                          })
-          duration = time.time() - start_time
-      else:
-          sess.run(full_layers_train_op, feed_dict={
-                          images_placeholder: train_images,
-                          labels_placeholder: train_labels
-                          })
-          duration = time.time() - start_time
+      sess.run(train_op, feed_dict={
+                      images_placeholder: train_images,
+                      labels_placeholder: train_labels
+                      })
+      duration = time.time() - start_time
       print('Step %d: %.3f sec' % (step, duration))
       step = step+1
       # Save a checkpoint and evaluate the model periodically.
-      if (step-1) % 10 == 0 or (step + 1) == FLAGS.max_steps:
-        saver.save(sess, os.path.join(model_save_dir, 'c3d_ucf_model'), global_step=step)
+      if (step-1) % 10 == 0 or (step) == FLAGS.max_steps:
+        saver.save(sess, os.path.join(model_save_dir, 'c3d_ucf_model'), global_step=step-1)
         print('Training Data Eval:')
         summary, acc = sess.run(
                         [merged, accuracy],
@@ -294,10 +283,9 @@ def run_training():
                         )
         summary, acc = sess.run(
                         [merged, accuracy],
-                        feed_dict={
-                                        images_placeholder: val_images,
-                                        labels_placeholder: val_labels
-                                        })
+                        feed_dict={images_placeholder: val_images,
+                            labels_placeholder: val_labels
+                            })
         print ("accuracy: " + "{:.5f}".format(acc))
         test_writer.add_summary(summary, step)
   print("done")
